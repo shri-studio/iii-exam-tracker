@@ -97,18 +97,30 @@ def calculate_credits(passed_exams, exam_data):
     return total
 
 def get_status(passed_exams, total_credits, exam_data):
+    """Determine professional status with correct Associateship logic"""
+    
+    # Licentiate requirements: IC-01 + (IC-02 OR IC-11)
     has_ic01 = passed_exams.get('IC-01', {}).get('passed', False)
     has_life = passed_exams.get('IC-02', {}).get('passed', False)
     has_general = passed_exams.get('IC-11', {}).get('passed', False)
     licentiate_compulsory = has_ic01 and (has_life or has_general)
     
-    has_assoc_life = passed_exams.get('IC-22', {}).get('passed', False) and passed_exams.get('IC-26', {}).get('passed', False)
-    has_assoc_nonlife = passed_exams.get('IC-45', {}).get('passed', False) and passed_exams.get('IC-46', {}).get('passed', False)
-    associate_compulsory = has_assoc_life or has_assoc_nonlife
+    # Associateship requirements: 
+    # 1 paper from Life stream (IC-22 OR IC-26)
+    has_life_paper = (passed_exams.get('IC-22', {}).get('passed', False) or 
+                      passed_exams.get('IC-26', {}).get('passed', False))
     
-    actuarial = ['IC-28', 'IC-47', 'IC-81', 'IC-84', 'IC-92']
+    # 1 paper from Non-Life stream (IC-45 OR IC-46)
+    has_nonlife_paper = (passed_exams.get('IC-45', {}).get('passed', False) or 
+                         passed_exams.get('IC-46', {}).get('passed', False))
+    
+    associate_compulsory = has_life_paper and has_nonlife_paper
+    
+    # Fellowship requirements: Any one Actuarial subject
+    actuarial = ['IC-28', 'IC-47', 'IC-81', 'IC-84', 'IC-92', 'AS-03', 'AS-05-iv', 'AS-05-v']
     has_actuarial = any(passed_exams.get(subj, {}).get('passed', False) for subj in actuarial)
     
+    # Determine status
     if total_credits >= 490 and has_actuarial and associate_compulsory and licentiate_compulsory:
         return "Fellowship (FIII)", 490
     elif total_credits >= 250 and associate_compulsory and licentiate_compulsory:
@@ -117,32 +129,97 @@ def get_status(passed_exams, total_credits, exam_data):
         return "Licentiate", 60
     else:
         return "Student", 60
-
+    
 def get_suggestions(passed_exams, total_credits, exam_data):
+    """Generate suggestions with correct Associateship logic"""
     suggestions = []
     passed_codes = [code for code, info in passed_exams.items() if info.get('passed', False)]
     
+    # Licentiate suggestions
     has_ic01 = 'IC-01' in passed_codes
     has_life = 'IC-02' in passed_codes
     has_general = 'IC-11' in passed_codes
     
     if not has_ic01:
-        suggestions.append({'code': 'IC-01', 'title': exam_data['IC-01']['title'], 'credits': 20, 'reason': 'Required for Licentiate Certificate', 'priority': 'High'})
+        suggestions.append({
+            'code': 'IC-01',
+            'title': exam_data['IC-01']['title'],
+            'credits': 20,
+            'reason': 'Required for Licentiate Certificate',
+            'priority': 'High'
+        })
+    
     if not has_life and not has_general:
-        suggestions.append({'code': 'IC-02 or IC-11', 'title': 'Practice of Life Insurance OR Practice of General Insurance', 'credits': 20, 'reason': 'One required for Licentiate', 'priority': 'High'})
+        suggestions.append({
+            'code': 'IC-02 or IC-11',
+            'title': 'Practice of Life Insurance OR Practice of General Insurance',
+            'credits': 20,
+            'reason': 'One required for Licentiate',
+            'priority': 'High'
+        })
+    
     if has_ic01 and (has_life or has_general) and total_credits < 60:
         needed = 60 - total_credits
-        suggestions.append({'code': 'Optional Subjects', 'title': 'Any optional subject', 'credits': needed, 'reason': f'Need {needed} more credits for Licentiate', 'priority': 'High'})
+        suggestions.append({
+            'code': 'Optional Subjects',
+            'title': 'Any optional subject (20-40 credits)',
+            'credits': needed,
+            'reason': f'Need {needed} more credits to complete Licentiate',
+            'priority': 'High'
+        })
     
+    # Associateship suggestions
     status, _ = get_status(passed_exams, total_credits, exam_data)
     if status == 'Licentiate' and total_credits >= 60:
-        has_assoc_life = 'IC-22' in passed_codes and 'IC-26' in passed_codes
-        has_assoc_nonlife = 'IC-45' in passed_codes and 'IC-46' in passed_codes
-        if not has_assoc_life and not has_assoc_nonlife:
-            suggestions.append({'code': 'IC-22 & IC-26 OR IC-45 & IC-46', 'title': 'Associateship Compulsory Subjects', 'credits': 60, 'reason': 'Required for Associateship', 'priority': 'High'})
+        has_life_paper = 'IC-22' in passed_codes or 'IC-26' in passed_codes
+        has_nonlife_paper = 'IC-45' in passed_codes or 'IC-46' in passed_codes
+        
+        missing = []
+        if not has_life_paper:
+            missing.append("one Life stream paper (IC-22 OR IC-26)")
+        if not has_nonlife_paper:
+            missing.append("one Non-Life stream paper (IC-45 OR IC-46)")
+        
+        if missing:
+            suggestions.append({
+                'code': 'Choose: IC-22/IC-26 + IC-45/IC-46',
+                'title': 'Associateship Compulsory Papers',
+                'credits': 60,
+                'reason': f'Required for Associateship: {", ".join(missing)}',
+                'priority': 'High'
+            })
         elif total_credits < 250:
             needed = 250 - total_credits
-            suggestions.append({'code': 'Optional Subjects', 'title': 'Additional optional subjects', 'credits': needed, 'reason': f'Need {needed} more credits for Associateship', 'priority': 'Medium'})
+            suggestions.append({
+                'code': 'Optional Subjects (30-40 credits each)',
+                'title': 'Additional optional subjects to reach 250 credits',
+                'credits': needed,
+                'reason': f'Need {needed} more credits for Associateship',
+                'priority': 'Medium'
+            })
+    
+    # Fellowship suggestions
+    if status == 'Associateship (AIII)' and total_credits >= 250:
+        actuarial = ['IC-28', 'IC-47', 'IC-81', 'IC-84', 'IC-92']
+        has_actuarial = any(code in passed_codes for code in actuarial)
+        
+        if not has_actuarial:
+            suggestions.append({
+                'code': 'Any Actuarial Subject',
+                'title': 'Compulsory Actuarial Subject for Fellowship',
+                'credits': 40,
+                'reason': 'One Actuarial subject is required for Fellowship (FIII)',
+                'priority': 'High'
+            })
+        elif total_credits < 490:
+            needed = 490 - total_credits
+            suggestions.append({
+                'code': 'Advanced Subjects (40 credits each)',
+                'title': 'Additional advanced subjects to reach 490 credits',
+                'credits': needed,
+                'reason': f'Need {needed} more credits for Fellowship (FIII)',
+                'priority': 'Medium'
+            })
     
     return suggestions
 
