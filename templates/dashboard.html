@@ -5,224 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - III Exam Tracker</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .logo {
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .card h2 {
-            color: #1e3c72;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #ff9800;
-            padding-bottom: 10px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        .navbar { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-size: 1.3rem; font-weight: bold; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; padding: 5px 10px; border-radius: 5px; }
+        .nav-links a:hover { background: rgba(255,255,255,0.2); }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 25px; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h2 { color: #1e3c72; margin-bottom: 20px; border-bottom: 3px solid #ff9800; padding-bottom: 10px; }
+        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-top: 10px; }
         .status-student { background: #ff9800; color: white; }
         .status-licentiate { background: #2196f3; color: white; }
         .status-associateship { background: #4caf50; color: white; }
         .status-fellowship { background: #9c27b0; color: white; }
-        
-        .progress-bar {
-            background: #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        
-        .progress-fill {
-            background: linear-gradient(90deg, #ff9800, #f57c00);
-            height: 30px;
-            border-radius: 10px;
-            transition: width 0.5s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .exam-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .exam-item {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .exam-item:hover {
-            background: #f8f9fa;
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #ff9800, #f57c00);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: #f44336;
-            color: white;
-        }
-        
-        .btn-small {
-            padding: 5px 12px;
-            font-size: 0.8rem;
-        }
-        
-        .suggestion-item {
-            padding: 12px;
-            margin-bottom: 10px;
-            border-left: 4px solid #ff9800;
-            background: #f8f9fa;
-            border-radius: 5px;
-        }
-        
-        .priority-high {
-            border-left-color: #f44336;
-            background: #ffebee;
-        }
-        
-        .priority-medium {
-            border-left-color: #ff9800;
-            background: #fff3e0;
-        }
-        
-        select, input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 100%;
-            margin-top: 5px;
-            font-size: 0.95rem;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
-        }
-        
-        .credits {
-            font-weight: bold;
-            color: #ff9800;
-            font-size: 1.2rem;
-        }
-        
-        .flash-messages {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1000;
-        }
-        
-        .flash-message {
-            padding: 12px 20px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            animation: slideIn 0.3s ease;
-        }
-        
+        .progress-bar { background: #e0e0e0; border-radius: 10px; overflow: hidden; margin: 15px 0; }
+        .progress-fill { background: linear-gradient(90deg, #ff9800, #f57c00); height: 30px; border-radius: 10px; transition: width 0.5s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .exam-list { max-height: 300px; overflow-y: auto; }
+        .exam-item { padding: 12px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .exam-item:hover { background: #f8f9fa; }
+        .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #ff9800, #f57c00); color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-small { padding: 5px 12px; font-size: 0.8rem; }
+        .suggestion-item { padding: 12px; margin-bottom: 10px; border-left: 4px solid #ff9800; background: #f8f9fa; border-radius: 5px; }
+        .priority-high { border-left-color: #f44336; background: #ffebee; }
+        .priority-medium { border-left-color: #ff9800; background: #fff3e0; }
+        select, input, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; margin-top: 5px; font-size: 0.95rem; }
+        .form-group { margin-bottom: 15px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+        .credits { font-weight: bold; color: #ff9800; font-size: 1.2rem; }
+        .searchable-select { position: relative; }
+        .search-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 5px; }
+        .options-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; background: white; }
+        .option-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .option-item:hover { background: #f0f0f0; }
+        .option-item.selected { background: #ff9800; color: white; }
+        .flash-messages { position: fixed; top: 80px; right: 20px; z-index: 1000; }
+        .flash-message { padding: 12px 20px; margin-bottom: 10px; border-radius: 8px; animation: slideIn 0.3s ease; }
         .flash-success { background: #4caf50; color: white; }
         .flash-danger { background: #f44336; color: white; }
         .flash-warning { background: #ff9800; color: white; }
         .flash-info { background: #2196f3; color: white; }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .navbar { flex-direction: column; gap: 15px; text-align: center; }
-            .nav-links a { margin: 0 10px; display: inline-block; }
-            .grid { grid-template-columns: 1fr; }
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @media (max-width: 768px) { .navbar { flex-direction: column; gap: 15px; text-align: center; } .nav-links a { margin: 0 10px; } .grid { grid-template-columns: 1fr; } }
+        .profile-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .profile-label { font-weight: bold; color: #1e3c72; margin-top: 10px; }
+        .profile-value { color: #666; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -246,22 +76,85 @@
     
     <div class="container">
         <div class="grid">
-            <!-- Profile Card -->
+            <!-- Profile Card with More Details -->
             <div class="card">
-                <h2>👤 Welcome, {{ username }}!</h2>
+                <h2>👤 Profile Details</h2>
                 <form method="POST">
-                    <div class="form-group">
-                        <label>Email (optional)</label>
-                        <input type="email" name="email" value="{{ user_profile.get('email', '') }}" placeholder="Your email">
+                    <div class="profile-section">
+                        <div class="profile-label">Basic Information</div>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="full_name" value="{{ user_profile.get('full_name', '') }}" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" value="{{ user_profile.get('email', '') }}" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" name="phone" value="{{ user_profile.get('phone', '') }}" placeholder="+91 1234567890">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>III Registration ID</label>
-                        <input type="text" name="registration_id" value="{{ user_profile.get('registration_id', '') }}" placeholder="Your III registration number">
+                    
+                    <div class="profile-section">
+                        <div class="profile-label">III Details</div>
+                        <div class="form-group">
+                            <label>III Registration ID</label>
+                            <input type="text" name="registration_id" value="{{ user_profile.get('registration_id', '') }}" placeholder="III registration number">
+                        </div>
+                        <div class="form-group">
+                            <label>Associated Institute</label>
+                            <input type="text" name="associated_institute" value="{{ user_profile.get('associated_institute', '') }}" placeholder="e.g., Mumbai Insurance Institute">
+                        </div>
+                        <div class="form-group">
+                            <label>Membership Type</label>
+                            <select name="membership_type">
+                                <option value="">Select membership type</option>
+                                <option value="Student" {% if user_profile.get('membership_type') == 'Student' %}selected{% endif %}>Student Member</option>
+                                <option value="Licentiate" {% if user_profile.get('membership_type') == 'Licentiate' %}selected{% endif %}>Licentiate</option>
+                                <option value="Associate" {% if user_profile.get('membership_type') == 'Associate' %}selected{% endif %}>Associate (AIII)</option>
+                                <option value="Fellow" {% if user_profile.get('membership_type') == 'Fellow' %}selected{% endif %}>Fellow (FIII)</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="submit" name="action" value="update_profile" class="btn btn-primary">Update Profile</button>
+                    
+                    <div class="profile-section">
+                        <div class="profile-label">Professional Information</div>
+                        <div class="form-group">
+                            <label>Employer/Organization</label>
+                            <input type="text" name="employer" value="{{ user_profile.get('employer', '') }}" placeholder="Company name">
+                        </div>
+                        <div class="form-group">
+                            <label>Designation/Role</label>
+                            <input type="text" name="designation" value="{{ user_profile.get('designation', '') }}" placeholder="e.g., Underwriter, Claims Officer">
+                        </div>
+                        <div class="form-group">
+                            <label>Years of Experience</label>
+                            <input type="number" name="experience_years" value="{{ user_profile.get('experience_years', '') }}" placeholder="Years in insurance industry">
+                        </div>
+                        <div class="form-group">
+                            <label>Department/Specialization</label>
+                            <input type="text" name="department" value="{{ user_profile.get('department', '') }}" placeholder="e.g., Underwriting, Claims, Marketing">
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <div class="profile-label">Educational Background</div>
+                        <div class="form-group">
+                            <label>Highest Qualification</label>
+                            <input type="text" name="qualification" value="{{ user_profile.get('qualification', '') }}" placeholder="e.g., MBA, B.Com, CA">
+                        </div>
+                        <div class="form-group">
+                            <label>Other Certifications</label>
+                            <textarea name="certifications" rows="2" placeholder="Other insurance certifications (e.g., CII, LOMA)">{{ user_profile.get('certifications', '') }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" name="action" value="update_profile" class="btn btn-primary">Save Profile</button>
                 </form>
-                <div class="flex-between" style="margin-top: 15px;">
-                    <span>📅 Joined:</span>
+                
+                <div class="flex-between" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <span>📅 Member Since:</span>
                     <span>{{ user_profile.get('created_at', 'Recently') }}</span>
                 </div>
             </div>
@@ -285,7 +178,7 @@
                     </div>
                 </div>
                 {% if credits_needed > 0 %}
-                <p>📌 Need <strong>{{ credits_needed }}</strong> more credits</p>
+                <p>📌 Need <strong>{{ credits_needed }}</strong> more credits for next level</p>
                 {% else %}
                 <p>🎉 Congratulations! You've achieved {{ status }}!</p>
                 {% endif %}
@@ -293,57 +186,66 @@
                     <span>📚 Exams Passed:</span>
                     <span><strong>{{ passed_exams|length }}</strong></span>
                 </div>
+                <div class="flex-between">
+                    <span>🏆 Leaderboard Rank:</span>
+                    <span id="rank">-</span>
+                </div>
             </div>
             
-            <!-- Add Exam Card -->
+            <!-- Add Exam Card with Searchable Dropdown -->
             <div class="card">
                 <h2>✅ Add Passed Exam</h2>
-                <form method="POST">
+                <form method="POST" id="addExamForm">
                     <div class="form-group">
-                        <label>Select Exam</label>
-                        <select name="exam_code" required>
-                            <option value="">Choose an exam...</option>
-                            {% for exam in available_exams %}
-                            <option value="{{ exam.code }}">
-                                {{ exam.code }} - {{ exam.title }} ({{ exam.credits }} credits)
-                                {% if exam.compulsory %}⭐ Compulsory{% endif %}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <label>Search and Select Exam</label>
+                        <div class="searchable-select">
+                            <input type="text" id="examSearch" class="search-input" placeholder="Type to search exam code or name..." autocomplete="off">
+                            <div id="examOptions" class="options-list" style="display: none;">
+                                {% for exam in available_exams %}
+                                <div class="option-item" data-code="{{ exam.code }}" data-title="{{ exam.title }}" data-credits="{{ exam.credits }}" data-compulsory="{{ exam.compulsory }}">
+                                    <strong>{{ exam.code }}</strong> - {{ exam.title }} ({{ exam.credits }} credits)
+                                    {% if exam.compulsory %}⭐ Compulsory{% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="exam_code" id="selectedExamCode" required>
+                        </div>
+                        <div id="selectedExamInfo" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px; display: none;"></div>
                     </div>
-                    <button type="submit" name="action" value="add_exam" class="btn btn-primary">Add Exam</button>
+                    <button type="submit" name="action" value="add_exam" class="btn btn-primary" id="addExamBtn" disabled>Add Exam</button>
                 </form>
+                {% if available_exams|length == 0 %}
+                <p style="margin-top: 15px; color: #4caf50;">🎉 You've passed all available exams!</p>
+                {% endif %}
             </div>
         </div>
         
         <div class="grid">
-            <!-- Passed Exams -->
+            <!-- Passed Exams Card with Confirmation on Remove -->
             <div class="card">
                 <h2>📋 Your Passed Exams</h2>
                 <div class="exam-list">
                     {% if passed_exams %}
                         {% for code, info in passed_exams.items() %}
-                            <div class="exam-item">
+                            <div class="exam-item" id="exam-{{ code }}">
                                 <div>
                                     <strong>{{ code }}</strong><br>
-                                    <small>{{ exam_data[code].title }}</small>
+                                    <small style="color: #666;">{{ exam_data[code].title }}</small>
+                                    <br><small style="color: #999;">Passed: {{ info.date }}</small>
                                 </div>
                                 <div style="text-align: right;">
                                     <div class="credits">{{ exam_data[code].credits }} credits</div>
-                                    <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="exam_code" value="{{ code }}">
-                                        <button type="submit" name="action" value="remove_exam" class="btn btn-danger btn-small">Remove</button>
-                                    </form>
+                                    <button class="btn btn-danger btn-small remove-exam-btn" data-code="{{ code }}" data-title="{{ exam_data[code].title }}">Remove</button>
                                 </div>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p style="text-align: center; color: #999; padding: 40px;">No exams added yet.</p>
+                        <p style="text-align: center; color: #999; padding: 40px;">No exams added yet. Search and add your first exam above!</p>
                     {% endif %}
                 </div>
             </div>
             
-            <!-- Suggestions -->
+            <!-- Suggestions Card -->
             <div class="card">
                 <h2>💡 Recommendations</h2>
                 {% if suggestions %}
@@ -363,12 +265,114 @@
     </div>
     
     <script>
+        // Searchable dropdown functionality
+        const examSearch = document.getElementById('examSearch');
+        const examOptions = document.getElementById('examOptions');
+        const selectedExamCode = document.getElementById('selectedExamCode');
+        const addExamBtn = document.getElementById('addExamBtn');
+        const selectedExamInfo = document.getElementById('selectedExamInfo');
+        
+        let allOptions = [];
+        
+        // Store all options
+        document.querySelectorAll('.option-item').forEach(opt => {
+            allOptions.push({
+                element: opt,
+                code: opt.dataset.code,
+                title: opt.dataset.title,
+                credits: opt.dataset.credits,
+                compulsory: opt.dataset.compulsory === 'True'
+            });
+        });
+        
+        // Show dropdown on focus
+        examSearch.addEventListener('focus', () => {
+            examOptions.style.display = 'block';
+            filterOptions();
+        });
+        
+        // Filter options as user types
+        examSearch.addEventListener('input', filterOptions);
+        
+        function filterOptions() {
+            const searchTerm = examSearch.value.toLowerCase();
+            let hasVisible = false;
+            
+            allOptions.forEach(opt => {
+                const matches = opt.code.toLowerCase().includes(searchTerm) || 
+                               opt.title.toLowerCase().includes(searchTerm);
+                opt.element.style.display = matches ? 'block' : 'none';
+                if (matches) hasVisible = true;
+            });
+            
+            examOptions.style.display = hasVisible ? 'block' : 'none';
+        }
+        
+        // Select an option
+        document.querySelectorAll('.option-item').forEach(opt => {
+            opt.addEventListener('click', () => {
+                const code = opt.dataset.code;
+                const title = opt.dataset.title;
+                const credits = opt.dataset.credits;
+                const compulsory = opt.dataset.compulsory === 'True';
+                
+                selectedExamCode.value = code;
+                examSearch.value = `${code} - ${title}`;
+                examOptions.style.display = 'none';
+                addExamBtn.disabled = false;
+                
+                selectedExamInfo.style.display = 'block';
+                selectedExamInfo.innerHTML = `
+                    ✅ Selected: <strong>${code}</strong> - ${title}<br>
+                    📊 ${credits} credits ${compulsory ? '⭐ Compulsory' : '📖 Optional'}
+                `;
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!examSearch.contains(e.target) && !examOptions.contains(e.target)) {
+                examOptions.style.display = 'none';
+            }
+        });
+        
+        // Remove exam with confirmation
+        document.querySelectorAll('.remove-exam-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const code = btn.dataset.code;
+                const title = btn.dataset.title;
+                
+                if (confirm(`❓ Are you sure you want to remove ${code} - ${title}?\n\nThis will remove the credits from your total.`)) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.innerHTML = `
+                        <input type="hidden" name="exam_code" value="${code}">
+                        <input type="hidden" name="action" value="remove_exam">
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+        
+        // Auto-hide flash messages
         setTimeout(() => {
             document.querySelectorAll('.flash-message').forEach(msg => {
                 msg.style.opacity = '0';
                 setTimeout(() => msg.remove(), 500);
             });
         }, 3000);
+        
+        // Fetch leaderboard rank (optional)
+        fetch('/api/rank')
+            .then(res => res.json())
+            .then(data => {
+                if (data.rank) {
+                    document.getElementById('rank').innerText = data.rank;
+                }
+            })
+            .catch(() => {});
     </script>
 </body>
 </html>
