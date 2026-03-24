@@ -12,6 +12,16 @@
         .nav-links a { color: white; text-decoration: none; margin-left: 20px; padding: 5px 10px; border-radius: 5px; }
         .nav-links a:hover { background: rgba(255,255,255,0.2); }
         .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        
+        /* Tab Styles */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; }
+        .tab-btn { padding: 12px 24px; background: none; border: none; font-size: 1rem; font-weight: bold; cursor: pointer; color: #666; transition: all 0.3s; border-radius: 8px 8px 0 0; }
+        .tab-btn:hover { background: #f0f0f0; color: #ff9800; }
+        .tab-btn.active { color: #ff9800; border-bottom: 3px solid #ff9800; background: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 25px; }
         .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .card h2 { color: #1e3c72; margin-bottom: 20px; border-bottom: 3px solid #ff9800; padding-bottom: 10px; }
@@ -38,7 +48,7 @@
         .credits { font-weight: bold; color: #ff9800; font-size: 1.2rem; }
         .searchable-select { position: relative; }
         .search-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 5px; }
-        .options-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; background: white; }
+        .options-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; background: white; position: absolute; width: 100%; z-index: 100; }
         .option-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
         .option-item:hover { background: #f0f0f0; }
         .option-item.selected { background: #ff9800; color: white; }
@@ -49,10 +59,13 @@
         .flash-warning { background: #ff9800; color: white; }
         .flash-info { background: #2196f3; color: white; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @media (max-width: 768px) { .navbar { flex-direction: column; gap: 15px; text-align: center; } .nav-links a { margin: 0 10px; } .grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .navbar { flex-direction: column; gap: 15px; text-align: center; } .nav-links a { margin: 0 10px; } .grid { grid-template-columns: 1fr; } .tabs { flex-wrap: wrap; } .tab-btn { flex: 1; text-align: center; } }
         .profile-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        .profile-label { font-weight: bold; color: #1e3c72; margin-top: 10px; }
-        .profile-value { color: #666; margin-bottom: 10px; }
+        .profile-label { font-weight: bold; color: #1e3c72; margin-bottom: 10px; font-size: 1.1rem; border-left: 3px solid #ff9800; padding-left: 10px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .stat-box { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #ff9800; }
+        .stat-label { color: #666; font-size: 0.9rem; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -75,10 +88,130 @@
     </nav>
     
     <div class="container">
-        <div class="grid">
-            <!-- Profile Card with More Details -->
+        <!-- Welcome Row -->
+        <div style="margin-bottom: 20px;">
+            <h1>Welcome, {{ user_profile.get('full_name', username) }}! 👋</h1>
+            <p style="color: #666;">Track your progress towards III professional qualifications</p>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('progress')">📊 Progress</button>
+            <button class="tab-btn" onclick="switchTab('profile')">👤 My Profile</button>
+        </div>
+        
+        <!-- Tab 1: Progress -->
+        <div id="tab-progress" class="tab-content active">
+            <div class="grid">
+                <!-- Progress Card -->
+                <div class="card">
+                    <h2>📊 Your Progress</h2>
+                    <div class="flex-between">
+                        <span><strong>Total Credits:</strong></span>
+                        <span class="credits">{{ total_credits }}</span>
+                    </div>
+                    <div class="flex-between">
+                        <span><strong>Current Status:</strong></span>
+                        <span class="status-badge status-{{ status.split()[0].lower() }}">
+                            {{ status }}
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ progress_percent }}%">
+                            {{ progress_percent }}%
+                        </div>
+                    </div>
+                    {% if credits_needed > 0 %}
+                    <p>📌 Need <strong>{{ credits_needed }}</strong> more credits for next level</p>
+                    {% else %}
+                    <p>🎉 Congratulations! You've achieved {{ status }}!</p>
+                    {% endif %}
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-number">{{ passed_exams|length }}</div>
+                            <div class="stat-label">Exams Passed</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" id="rank">-</div>
+                            <div class="stat-label">Leaderboard Rank</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Exam Card with Searchable Dropdown -->
+                <div class="card">
+                    <h2>✅ Add Passed Exam</h2>
+                    <form method="POST" id="addExamForm">
+                        <div class="form-group">
+                            <label>Search and Select Exam</label>
+                            <div class="searchable-select" style="position: relative;">
+                                <input type="text" id="examSearch" class="search-input" placeholder="Type to search exam code or name..." autocomplete="off">
+                                <div id="examOptions" class="options-list" style="display: none; position: absolute; top: 100%; left: 0; right: 0;">
+                                    {% for exam in available_exams %}
+                                    <div class="option-item" data-code="{{ exam.code }}" data-title="{{ exam.title }}" data-credits="{{ exam.credits }}" data-compulsory="{{ exam.compulsory }}">
+                                        <strong>{{ exam.code }}</strong> - {{ exam.title }} ({{ exam.credits }} credits)
+                                        {% if exam.compulsory %}⭐ Compulsory{% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <input type="hidden" name="exam_code" id="selectedExamCode" required>
+                            </div>
+                            <div id="selectedExamInfo" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px; display: none;"></div>
+                        </div>
+                        <button type="submit" name="action" value="add_exam" class="btn btn-primary" id="addExamBtn" disabled>Add Exam</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <!-- Passed Exams Card -->
+                <div class="card">
+                    <h2>📋 Your Passed Exams</h2>
+                    <div class="exam-list">
+                        {% if passed_exams %}
+                            {% for code, info in passed_exams.items() %}
+                                <div class="exam-item" id="exam-{{ code }}">
+                                    <div>
+                                        <strong>{{ code }}</strong><br>
+                                        <small style="color: #666;">{{ exam_data[code].title }}</small>
+                                        <br><small style="color: #999;">Passed: {{ info.date }}</small>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="credits">{{ exam_data[code].credits }} credits</div>
+                                        <button class="btn btn-danger btn-small remove-exam-btn" data-code="{{ code }}" data-title="{{ exam_data[code].title }}">Remove</button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center; color: #999; padding: 40px;">No exams added yet. Search and add your first exam above!</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Suggestions Card -->
+                <div class="card">
+                    <h2>💡 Recommendations</h2>
+                    {% if suggestions %}
+                        {% for sugg in suggestions %}
+                        <div class="suggestion-item priority-{{ sugg.priority.lower() }}">
+                            <div><strong>{{ sugg.code }}</strong></div>
+                            <div>{{ sugg.title }}</div>
+                            <div><small>{{ sugg.reason }}</small></div>
+                            <div><strong class="credits">{{ sugg.credits }} credits</strong></div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="text-align: center; color: #4caf50; padding: 20px;">🎯 Great job! You're on track!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Profile (Full Details) -->
+        <div id="tab-profile" class="tab-content">
             <div class="card">
-                <h2>👤 Profile Details</h2>
+                <h2>👤 Complete Profile</h2>
                 <form method="POST">
                     <div class="profile-section">
                         <div class="profile-label">Basic Information</div>
@@ -146,125 +279,41 @@
                         </div>
                         <div class="form-group">
                             <label>Other Certifications</label>
-                            <textarea name="certifications" rows="2" placeholder="Other insurance certifications (e.g., CII, LOMA)">{{ user_profile.get('certifications', '') }}</textarea>
+                            <textarea name="certifications" rows="3" placeholder="Other insurance certifications (e.g., CII, LOMA)">{{ user_profile.get('certifications', '') }}</textarea>
                         </div>
                     </div>
                     
-                    <button type="submit" name="action" value="update_profile" class="btn btn-primary">Save Profile</button>
-                </form>
-                
-                <div class="flex-between" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                    <span>📅 Member Since:</span>
-                    <span>{{ user_profile.get('created_at', 'Recently') }}</span>
-                </div>
-            </div>
-            
-            <!-- Progress Card -->
-            <div class="card">
-                <h2>📊 Your Progress</h2>
-                <div class="flex-between">
-                    <span><strong>Total Credits:</strong></span>
-                    <span class="credits">{{ total_credits }}</span>
-                </div>
-                <div class="flex-between">
-                    <span><strong>Current Status:</strong></span>
-                    <span class="status-badge status-{{ status.split()[0].lower() }}">
-                        {{ status }}
-                    </span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ progress_percent }}%">
-                        {{ progress_percent }}%
-                    </div>
-                </div>
-                {% if credits_needed > 0 %}
-                <p>📌 Need <strong>{{ credits_needed }}</strong> more credits for next level</p>
-                {% else %}
-                <p>🎉 Congratulations! You've achieved {{ status }}!</p>
-                {% endif %}
-                <div class="flex-between">
-                    <span>📚 Exams Passed:</span>
-                    <span><strong>{{ passed_exams|length }}</strong></span>
-                </div>
-                <div class="flex-between">
-                    <span>🏆 Leaderboard Rank:</span>
-                    <span id="rank">-</span>
-                </div>
-            </div>
-            
-            <!-- Add Exam Card with Searchable Dropdown -->
-            <div class="card">
-                <h2>✅ Add Passed Exam</h2>
-                <form method="POST" id="addExamForm">
-                    <div class="form-group">
-                        <label>Search and Select Exam</label>
-                        <div class="searchable-select">
-                            <input type="text" id="examSearch" class="search-input" placeholder="Type to search exam code or name..." autocomplete="off">
-                            <div id="examOptions" class="options-list" style="display: none;">
-                                {% for exam in available_exams %}
-                                <div class="option-item" data-code="{{ exam.code }}" data-title="{{ exam.title }}" data-credits="{{ exam.credits }}" data-compulsory="{{ exam.compulsory }}">
-                                    <strong>{{ exam.code }}</strong> - {{ exam.title }} ({{ exam.credits }} credits)
-                                    {% if exam.compulsory %}⭐ Compulsory{% endif %}
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <input type="hidden" name="exam_code" id="selectedExamCode" required>
+                    <div class="profile-section">
+                        <div class="profile-label">Account Information</div>
+                        <div class="flex-between">
+                            <span>Username:</span>
+                            <span><strong>{{ username }}</strong></span>
                         </div>
-                        <div id="selectedExamInfo" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px; display: none;"></div>
+                        <div class="flex-between">
+                            <span>Member Since:</span>
+                            <span>{{ user_profile.get('created_at', 'Recently') }}</span>
+                        </div>
                     </div>
-                    <button type="submit" name="action" value="add_exam" class="btn btn-primary" id="addExamBtn" disabled>Add Exam</button>
+                    
+                    <button type="submit" name="action" value="update_profile" class="btn btn-primary">💾 Save Profile</button>
                 </form>
-                {% if available_exams|length == 0 %}
-                <p style="margin-top: 15px; color: #4caf50;">🎉 You've passed all available exams!</p>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="grid">
-            <!-- Passed Exams Card with Confirmation on Remove -->
-            <div class="card">
-                <h2>📋 Your Passed Exams</h2>
-                <div class="exam-list">
-                    {% if passed_exams %}
-                        {% for code, info in passed_exams.items() %}
-                            <div class="exam-item" id="exam-{{ code }}">
-                                <div>
-                                    <strong>{{ code }}</strong><br>
-                                    <small style="color: #666;">{{ exam_data[code].title }}</small>
-                                    <br><small style="color: #999;">Passed: {{ info.date }}</small>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div class="credits">{{ exam_data[code].credits }} credits</div>
-                                    <button class="btn btn-danger btn-small remove-exam-btn" data-code="{{ code }}" data-title="{{ exam_data[code].title }}">Remove</button>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="text-align: center; color: #999; padding: 40px;">No exams added yet. Search and add your first exam above!</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Suggestions Card -->
-            <div class="card">
-                <h2>💡 Recommendations</h2>
-                {% if suggestions %}
-                    {% for sugg in suggestions %}
-                    <div class="suggestion-item priority-{{ sugg.priority.lower() }}">
-                        <div><strong>{{ sugg.code }}</strong></div>
-                        <div>{{ sugg.title }}</div>
-                        <div><small>{{ sugg.reason }}</small></div>
-                        <div><strong class="credits">{{ sugg.credits }} credits</strong></div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p style="text-align: center; color: #4caf50; padding: 20px;">🎯 Great job! You're on track!</p>
-                {% endif %}
             </div>
         </div>
     </div>
     
     <script>
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
         // Searchable dropdown functionality
         const examSearch = document.getElementById('examSearch');
         const examOptions = document.getElementById('examOptions');
@@ -274,7 +323,6 @@
         
         let allOptions = [];
         
-        // Store all options
         document.querySelectorAll('.option-item').forEach(opt => {
             allOptions.push({
                 element: opt,
@@ -285,30 +333,24 @@
             });
         });
         
-        // Show dropdown on focus
         examSearch.addEventListener('focus', () => {
             examOptions.style.display = 'block';
             filterOptions();
         });
         
-        // Filter options as user types
         examSearch.addEventListener('input', filterOptions);
         
         function filterOptions() {
             const searchTerm = examSearch.value.toLowerCase();
             let hasVisible = false;
-            
             allOptions.forEach(opt => {
-                const matches = opt.code.toLowerCase().includes(searchTerm) || 
-                               opt.title.toLowerCase().includes(searchTerm);
+                const matches = opt.code.toLowerCase().includes(searchTerm) || opt.title.toLowerCase().includes(searchTerm);
                 opt.element.style.display = matches ? 'block' : 'none';
                 if (matches) hasVisible = true;
             });
-            
             examOptions.style.display = hasVisible ? 'block' : 'none';
         }
         
-        // Select an option
         document.querySelectorAll('.option-item').forEach(opt => {
             opt.addEventListener('click', () => {
                 const code = opt.dataset.code;
@@ -320,19 +362,14 @@
                 examSearch.value = `${code} - ${title}`;
                 examOptions.style.display = 'none';
                 addExamBtn.disabled = false;
-                
                 selectedExamInfo.style.display = 'block';
-                selectedExamInfo.innerHTML = `
-                    ✅ Selected: <strong>${code}</strong> - ${title}<br>
-                    📊 ${credits} credits ${compulsory ? '⭐ Compulsory' : '📖 Optional'}
-                `;
+                selectedExamInfo.innerHTML = `✅ Selected: <strong>${code}</strong> - ${title}<br>📊 ${credits} credits ${compulsory ? '⭐ Compulsory' : '📖 Optional'}`;
             });
         });
         
-        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!examSearch.contains(e.target) && !examOptions.contains(e.target)) {
-                examOptions.style.display = 'none';
+            if (!examSearch?.contains(e.target) && !examOptions?.contains(e.target)) {
+                if (examOptions) examOptions.style.display = 'none';
             }
         });
         
@@ -342,14 +379,10 @@
                 e.preventDefault();
                 const code = btn.dataset.code;
                 const title = btn.dataset.title;
-                
                 if (confirm(`❓ Are you sure you want to remove ${code} - ${title}?\n\nThis will remove the credits from your total.`)) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.innerHTML = `
-                        <input type="hidden" name="exam_code" value="${code}">
-                        <input type="hidden" name="action" value="remove_exam">
-                    `;
+                    form.innerHTML = `<input type="hidden" name="exam_code" value="${code}"><input type="hidden" name="action" value="remove_exam">`;
                     document.body.appendChild(form);
                     form.submit();
                 }
@@ -364,13 +397,11 @@
             });
         }, 3000);
         
-        // Fetch leaderboard rank (optional)
+        // Fetch leaderboard rank
         fetch('/api/rank')
             .then(res => res.json())
             .then(data => {
-                if (data.rank) {
-                    document.getElementById('rank').innerText = data.rank;
-                }
+                if (data.rank) document.getElementById('rank').innerText = data.rank;
             })
             .catch(() => {});
     </script>
