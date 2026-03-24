@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+user_data.json
+.env
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/

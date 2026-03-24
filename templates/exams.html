@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Exams - III Exam Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ff9800;
+            padding-bottom: 10px;
+        }
+        
+        .exam-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .exam-table th,
+        .exam-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .exam-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .exam-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .level-licentiate { background: #2196f3; color: white; }
+        .level-associateship { background: #4caf50; color: white; }
+        .level-optional { background: #ff9800; color: white; }
+        .level-fellowship { background: #9c27b0; color: white; }
+        
+        .compulsory-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            background: #f44336;
+            color: white;
+            margin-left: 8px;
+        }
+        
+        .passed-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            background: #4caf50;
+            color: white;
+        }
+        
+        .credits {
+            font-weight: bold;
+            color: #ff9800;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #ff9800;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; text-align: center; }
+            .exam-table th, .exam-table td { padding: 8px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🏦 III Exam Tracker</div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/exams">All Exams</a>
+            <a href="/leaderboard">Leaderboard</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+        
+        <div class="card">
+            <h2>📚 All Professional Examinations</h2>
+            <p style="margin-bottom: 20px; color: #666;">Based on Insurance Institute of India syllabus</p>
+            
+            {% for level, exams in exams_by_level.items() %}
+                {% if exams %}
+                <h3 style="margin: 20px 0 10px 0; color: #1e3c72;">
+                    {% if level == 'Licentiate' %}🎓 Licentiate Level (60 credits required)
+                    {% elif level == 'Associateship' %}📘 Associateship Level (250 credits total)
+                    {% elif level == 'Optional' %}📖 Optional Subjects
+                    {% else %}🏆 Fellowship Level (490 credits total)
+                    {% endif %}
+                </h3>
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Title</th>
+                            <th>Credits</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr>
+                            <td><strong>{{ exam.code }}</strong></td>
+                            <td>
+                                {{ exam.title }}
+                                {% if exam.compulsory %}
+                                <span class="compulsory-badge">Compulsory</span>
+                                {% endif %}
+                            </td>
+                            <td class="credits">{{ exam.credits }}</td>
+                            <td>
+                                {% if exam.passed %}
+                                <span class="passed-badge">✓ Passed</span>
+                                {% else %}
+                                <span style="color: #999;">Not taken</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            {% endfor %}
+            
+            <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
+                <h4 style="color: #1976d2;">📌 Important Notes:</h4>
+                <ul style="margin-top: 10px; margin-left: 20px; color: #555;">
+                    <li>Licentiate requires: IC-01 + (IC-02 or IC-11) + 20 more credits</li>
+                    <li>Associateship requires: 250 total credits + Licentiate + compulsory subjects</li>
+                    <li>Fellowship requires: 490 total credits + Associateship + one Actuarial subject</li>
+                    <li>All exams are objective type (MCQ) with 2 hours duration</li>
+                    <li>Passing marks: 60% or above</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
